@@ -1,5 +1,5 @@
 pool:
-  name: Default # Ensure this matches your self-hosted agent pool name
+  name: test # Ensure this matches your self-hosted agent pool name
   demands:
     - agent.name -equals DESKTOP-7LOV8H7
 
