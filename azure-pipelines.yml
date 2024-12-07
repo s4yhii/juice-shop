@@ -1,7 +1,9 @@
 trigger: none
 
 pool:
-  name: 'default'
+  name: 'Default'
+  demands:
+    - Agent.Version -gtVersion 3.248.0
 
 parameters:
   - name: pythonVersion
