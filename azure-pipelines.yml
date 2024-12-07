@@ -1,20 +1,54 @@
+trigger: none
+
 pool:
-  name: test # Ensure this matches your self-hosted agent pool name
-  demands:
-    - agent.name -equals DESKTOP-7LOV8H7
+  name: 'default'
 
-variables:
-- group: Semgrep_Variables
+parameters:
+  - name: pythonVersion
+    displayName: 'Python version'
+    default: '3.10.12'
 
-steps:
-- checkout: self
-  clean: true
-  fetchDepth: 20
-  persistCredentials: true
+stages:
+  - stage: sast_test
+    displayName: SAST Scan
+    jobs:
+      - job: SemgrepScan
+        displayName: 'Semgrep Code Security Scan'
+        steps:
+          - checkout: self
+            clean: true
+            fetchDepth: 0
+            persistCredentials: true
 
-- script: |
-    python -m pip install --upgrade pip
-    pip install semgrep
-    echo "Semgrep full scan"
-    semgrep ci
-  displayName: Run Semgrep Scan
+          - script: |
+              mkdir -p $(Agent.ToolsDirectory)/Python/$( parameters.pythonVersion )/x64
+              mkdir -p $(Agent.ToolsDirectory)/Python/$( parameters.pythonVersion )/x64.complete
+            displayName: 'Create Python local folders'
+
+          - script: |
+              curl -o python.tar.gz https://github.com/actions/python-versions/releases/download/3.10.12-5208601951/python-3.10.12-linux-22.04-x64.tar.gz
+              tar -xzf python.tar.gz -C $(Agent.ToolsDirectory)/Python/$( parameters.pythonVersion )/x64
+            displayName: 'Download Python'
+
+          - task: UsePythonVersion@0
+            inputs:
+              versionSpec: $( parameters.pythonVersion )
+              addToPath: true
+              architecture: 'x64'
+            displayName: 'Install Python $( parameters.pythonVersion )'
+
+          - script: |
+              python -m pip install --upgrade pip
+              pip install semgrep==1.55.1
+            displayName: 'Install Semgrep'
+
+          - script: |
+              semgrep ci
+            displayName: 'Run Semgrep SAST Scan'
+            env:
+              SEMGREP_PR_ID: $(System.PullRequest.PullRequestId)
+              SEMGREP_COMMIT: $(Build.SourceVersion)
+              SEMGREP_REPO_NAME: $(SEMGREP_REPO_NAME)
+              SEMGREP_REPO_URL: $(SEMGREP_REPO_URL)
+              SEMGREP_BRANCH: $(SEMGREP_BRANCH)
+              SEMGREP_APP_TOKEN: $(SEMGREP_APP_TOKEN)
