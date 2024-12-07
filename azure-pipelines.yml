@@ -1,6 +1,8 @@
 pool:
+  name: Default # Ensure this matches your self-hosted agent pool name
   demands:
     - agent.name -equals DESKTOP-7LOV8H7
+
 variables:
 - group: Semgrep_Variables
 
@@ -9,9 +11,10 @@ steps:
   clean: true
   fetchDepth: 20
   persistCredentials: true
-# Replace main with the repository default branch if different.
+
 - script: |
     python -m pip install --upgrade pip
     pip install semgrep
     echo "Semgrep full scan"
     semgrep ci
+  displayName: Run Semgrep Scan
