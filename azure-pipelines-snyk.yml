@@ -2,7 +2,9 @@ trigger:
   - main
 
 pool:
-  vmImage: 'ubuntu-latest'
+  name: Default # This should match the pool your self-hosted agent belongs to
+  demands:
+    - agent.name -equals kali
 
 steps:
   - task: UseNode@1
