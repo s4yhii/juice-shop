@@ -1,0 +1,28 @@
+trigger:
+  - main
+
+pool:
+  name: Default # This should match the pool your self-hosted agent belongs to
+  demands:
+    - agent.name -equals kali
+
+steps:
+  - task: SonarCloudPrepare@1
+    inputs:
+      SonarCloud: 'SonarCloudConnection'  # Configurado en Azure DevOps Service Connections
+      organization: 'your_organization_name'
+      scannerMode: 'CLI'
+      configMode: 'manual'
+      cliProjectKey: 'juice-shop'
+      cliProjectName: 'Juice Shop'
+      cliSources: '.'
+
+  - script: |
+      npm install
+    displayName: 'Install Dependencies'
+
+  - task: SonarCloudAnalyze@1
+    displayName: 'Run SonarCloud Analysis'
+
+  - task: SonarCloudPublish@1
+    displayName: 'Publish Quality Gate'
