@@ -1,9 +1,12 @@
 trigger: none
 
 pool:
-  name: 'Default'
+  name: test
   demands:
-    - Agent.Version -gtVersion 3.248.0
+    - agent.name -equals DESKTOP-7LOV8H7
+
+variables:
+- group: Semgrep_Variables
 
 parameters:
   - name: pythonVersion
