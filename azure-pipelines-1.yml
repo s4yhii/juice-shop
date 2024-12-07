@@ -1,7 +1,7 @@
 pool:
   name: Default # This should match the pool your self-hosted agent belongs to
   demands:
-    - agent.name -equals DESKTOP-7LOV8H7
+    - agent.name -equals kali
     
 variables:
 - group: Semgrep_Variables
