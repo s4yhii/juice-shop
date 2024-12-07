@@ -1,0 +1,26 @@
+trigger:
+  - main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+  - task: UseNode@1
+    inputs:
+      versionSpec: '14.x'
+      addToPath: true
+
+  - script: |
+      npm install -g snyk
+      snyk auth $(SNYK_TOKEN)
+    displayName: 'Install and Authenticate Snyk'
+
+  - script: |
+      snyk code test --json-file-output=snyk-results.json
+    displayName: 'Run Snyk Code Analysis'
+
+  - task: PublishBuildArtifacts@1
+    inputs:
+      pathToPublish: 'snyk-results.json'
+      artifactName: 'SnykResults'
+      publishLocation: 'Container'
